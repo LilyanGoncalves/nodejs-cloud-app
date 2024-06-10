@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-cloud-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "build": "echo \"Building the project...\"",
+    "start": "node app.js",
+    "seed": "node seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Lilyan Barbosa Goncalves",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.10.0"
+  }
+}
