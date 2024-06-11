@@ -5,9 +5,16 @@
   "main": "app.js",
   "scripts": {
     "build": "echo \"Building the project...\"",
-    "start": "node app.js",
+    "seed-start": "npm seed && npm start",
     "seed": "node seed.js",
+    "start": "node app.js",
+    "remove": "docker rm nodejs-cloud-app",
+    "docker:build": "docker build -t lilyangoncalves/nodejs-cloud-app:12 .",
+    "docker:tag": "docker tag lilyangoncalves/nodejs-cloud-app:12 lilyangoncalves/nodejs-cloud-app:12",
+    "docker:push": "docker push lilyangoncalves/nodejs-cloud-app:12",
+    "docker:run": "docker run --network app-network -p 3000:3000 --name nodejs-cloud-app -d lilyangoncalves/nodejs-cloud-app:latest",
     "test": "echo \"Error: no test specified\" && exit 1"
+
   },
   "keywords": [],
   "author": "Lilyan Barbosa Goncalves",

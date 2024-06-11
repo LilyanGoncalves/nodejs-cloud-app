@@ -6,22 +6,33 @@ const port = 3000;
 
 // Configurações do banco de dados
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 3307,  // Porta configurada para conexão com MySQL no container
-  user: process.env.DB_USER || 'user',
-  password: process.env.DB_PASSWORD || 'passwd',
-  database: process.env.DB_NAME || 'db_aula'
+  host: 'mysql',
+  port: 3306,
+  user: 'user',
+  password: '123456',
+  database: 'db_aula',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 };
 
-const connection = mysql.createConnection(dbConfig);
+const pool = mysql.createPool(dbConfig);
 
 // Endpoint de consulta de dados
-app.get('/consulta-dados', (req, res) => {
-  connection.query('SELECT * FROM table_name', (error, results) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
+app.get('/consulta-dados', (request, response) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      return response.status(500).json({ error: err.message });
     }
-    res.json(results);
+
+    connection.query('SELECT * FROM Clientes', (error, results) => {
+      connection.release(); 
+
+      if (error) {
+        return response.status(500).json({ error: error.message });
+      }
+      response.json(results);
+    });
   });
 });
 

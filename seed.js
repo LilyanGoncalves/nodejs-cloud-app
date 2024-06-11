@@ -1,13 +1,17 @@
 const mysql = require('mysql2');
 
 const dbConfig = {
-  host: 'localhost', // nome do serviço no docker-compose
+  host: 'mysql',
+  port: 3306,
   user: 'user',
   password: '123456',
-  database: 'db_aula'
+  database: 'db_aula',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 };
 
-const connection = mysql.createConnection(dbConfig);
+const pool = mysql.createPool(dbConfig);
 
 const dropTableQuery = `
   DROP TABLE IF EXISTS customers;
@@ -38,34 +42,41 @@ const seedDataQuery = `
   ('Igor Barbosa', 31, '901-234-5678', 'igor.barbosa@example.com', 'user', 'senha9'),
   ('Juliana Ferreira', 27, '012-345-6789', 'juliana.ferreira@example.com', 'user', 'senha10');
 `;
-
-connection.connect(err => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-    process.exit(1);
-  }
-
-  connection.query(dropTableQuery, (err) => {
+pool.getConnection((err, connection) => {
+  connection.connect(err => {
     if (err) {
-      console.error('Error dropping table:', err);
+      console.error('Error connecting to the database:', err);
       process.exit(1);
     }
 
-    connection.query(createTableQuery, (err) => {
+    connection.query(dropTableQuery, (err) => {
       if (err) {
-        console.error('Error creating table:', err);
+        console.error('Error dropping table:', err);
         process.exit(1);
       }
 
-      connection.query(seedDataQuery, (err) => {
+      connection.query(createTableQuery, (err) => {
         if (err) {
-          console.error('Error seeding data:', err);
+          console.error('Error creating table:', err);
           process.exit(1);
         }
 
-        console.log('Database initialized successfully.');
-        process.exit(0);
+        connection.query(seedDataQuery, (err) => {
+          if (err) {
+            console.error('Error seeding data:', err);
+            process.exit(1);
+          }
+
+          console.log('Database initialized successfully.');
+          process.exit(0);
+        });
       });
+
     });
   });
+
+  if (error) {
+    return response.status(500).json({ error: error.message });
+  }
+  response.json(results);
 });
